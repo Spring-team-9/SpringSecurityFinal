@@ -1,11 +1,10 @@
 package com.example.team9_SpringSecurity.util.jwt;
 
-import com.example.team9_SpringSecurity.dto.SecurityExceptionDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.team9_SpringSecurity.util.ApiResponse.CustomException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import static com.example.team9_SpringSecurity.util.ApiResponse.CodeError.INVALID_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,9 +29,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = jwtUtil.resolveToken(request);
 
         if(token != null) {
-            if(!jwtUtil.validateToken(token)) {
-                jwtExceptionHandler(response, "Token Error", HttpStatus.UNAUTHORIZED.value());
-                return;
+            if(!jwtUtil.validateToken(token)){
+                throw new CustomException(INVALID_TOKEN);
             }
             Claims info = jwtUtil.getUserInfoFromToken(token);
             setAuthentication(info.getSubject());
@@ -46,16 +45,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
     }
-
-    public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
-        response.setStatus(statusCode);
-        response.setContentType("application/json");
-        try {
-            String json = new ObjectMapper().writeValueAsString(new SecurityExceptionDto(statusCode, msg));
-            response.getWriter().write(json);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-    }
-
 }

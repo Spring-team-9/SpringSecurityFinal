@@ -11,5 +11,4 @@ public class team9SpringSecurityApplication {
     public static void main(String[] args) {
         SpringApplication.run(team9SpringSecurityApplication.class, args);
     }
-
 }

@@ -4,9 +4,10 @@ import com.example.team9_SpringSecurity.dto.LoginRequestDto;
 import com.example.team9_SpringSecurity.dto.MessageDto;
 import com.example.team9_SpringSecurity.dto.SignupRequestDto;
 import com.example.team9_SpringSecurity.service.UserService;
+import com.example.team9_SpringSecurity.util.ApiResponse.ApiResult;
+import com.example.team9_SpringSecurity.util.ApiResponse.ApiUtil;
+import com.example.team9_SpringSecurity.util.ApiResponse.CodeSuccess;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,14 +24,15 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<MessageDto> signup(@RequestBody @Valid SignupRequestDto dto){
+
+    public ApiResult signup(@RequestBody @Valid SignupRequestDto dto){
         MessageDto messageDto = userService.signup(dto);
-        return new ResponseEntity<>(messageDto, HttpStatus.OK);
+        return ApiUtil.successResponse(CodeSuccess.JOIN_OK, messageDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<MessageDto> login(@RequestBody LoginRequestDto dto, HttpServletResponse response){
+    public ApiResult login(@RequestBody LoginRequestDto dto, HttpServletResponse response){
         MessageDto messageDto = userService.login(dto, response);
-        return new ResponseEntity<>(messageDto, HttpStatus.OK);
+        return ApiUtil.successResponse(CodeSuccess.LOGIN_OK, messageDto);
     }
 }
