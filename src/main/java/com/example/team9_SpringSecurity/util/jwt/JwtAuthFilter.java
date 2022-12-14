@@ -4,6 +4,7 @@ import com.example.team9_SpringSecurity.util.ApiResponse.CustomException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,12 +15,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
 import static com.example.team9_SpringSecurity.util.ApiResponse.CodeError.INVALID_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
+
     private final JwtUtil jwtUtil;
 
     @Override
@@ -29,20 +30,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if(token != null) {
             if(!jwtUtil.validateToken(token)){
-
                 throw new CustomException(INVALID_TOKEN);
             }
             Claims info = jwtUtil.getUserInfoFromToken(token);
             setAuthentication(info.getSubject());
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
+
 
     public void setAuthentication(String username) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.createAuthentication(username);
         context.setAuthentication(authentication);
-
         SecurityContextHolder.setContext(context);
     }
 }

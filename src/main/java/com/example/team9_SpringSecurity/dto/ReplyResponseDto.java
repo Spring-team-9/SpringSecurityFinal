@@ -12,6 +12,7 @@ public class ReplyResponseDto {
     private String replyContent;
     private Long likeCnt;
 
+
     public ReplyResponseDto(Reply reply) {
         this.replyId = reply.getReplyId();
         this.memoId = reply.getMemo().getMemoId();
@@ -26,4 +27,5 @@ public class ReplyResponseDto {
         this.replyContent = reply.getReplyContent();
         this.likeCnt = likeCnt;
     }
+
 }

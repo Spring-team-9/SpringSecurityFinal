@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,16 +31,15 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
+    public WebSecurityCustomizer webSecurityCustomizer(){
+        //h2-console 사용 및 resources 접근 허용 설정
         return (web) -> web.ignoring()
-                .requestMatchers(PathRequest.toH2Console())
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+                .requestMatchers(PathRequest.toH2Console());
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
-
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()

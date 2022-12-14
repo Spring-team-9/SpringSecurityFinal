@@ -3,6 +3,7 @@ package com.example.team9_SpringSecurity.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+
 // Response로 나갈 모든 데이터 형식을 하나로 받기 위한 Dto
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL) // null값 아닌 것만 Json에 추가하기

@@ -1,6 +1,7 @@
 package com.example.team9_SpringSecurity.entity;
 
 public enum UserRoleEnum {
+
     USER(Authority.USER),  // 사용자 권한
     ADMIN(Authority.ADMIN);  // 관리자 권한
 
@@ -11,6 +12,7 @@ public enum UserRoleEnum {
     }
 
     public String getAuthority(){
+
         return this.authority;
     }
 
@@ -19,3 +21,4 @@ public enum UserRoleEnum {
         public static final String ADMIN = "ROLE_ADMIN";
     }
 }
+

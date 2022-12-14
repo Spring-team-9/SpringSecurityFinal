@@ -24,20 +24,13 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-//    public ResponseEntity<MessageDto> signup(@RequestBody @Valid SignupRequestDto dto){
-//        MessageDto messageDto = userService.signup(dto);
-//        return new ResponseEntity<>(messageDto, HttpStatus.OK);
-//    }
+
     public ApiResult signup(@RequestBody @Valid SignupRequestDto dto){
         MessageDto messageDto = userService.signup(dto);
         return ApiUtil.successResponse(CodeSuccess.JOIN_OK, messageDto);
     }
 
     @PostMapping("/login")
-//    public ResponseEntity<MessageDto> login(@RequestBody LoginRequestDto dto, HttpServletResponse response){
-//        MessageDto messageDto = userService.login(dto, response);
-//        return new ResponseEntity<>(messageDto, HttpStatus.OK);
-//    }
     public ApiResult login(@RequestBody LoginRequestDto dto, HttpServletResponse response){
         MessageDto messageDto = userService.login(dto, response);
         return ApiUtil.successResponse(CodeSuccess.LOGIN_OK, messageDto);

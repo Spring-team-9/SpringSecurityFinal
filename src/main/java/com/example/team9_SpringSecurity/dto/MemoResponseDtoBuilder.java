@@ -1,5 +1,7 @@
 package com.example.team9_SpringSecurity.dto;
 
+
+import com.example.team9_SpringSecurity.entity.Reply;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

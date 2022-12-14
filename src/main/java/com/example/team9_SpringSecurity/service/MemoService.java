@@ -7,6 +7,7 @@ import com.example.team9_SpringSecurity.repository.MemoRepository;
 import com.example.team9_SpringSecurity.repository.LikeReplyRepository;
 import com.example.team9_SpringSecurity.repository.ReplyRepository;
 import com.example.team9_SpringSecurity.util.ApiResponse.CustomException;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.team9_SpringSecurity.util.ApiResponse.CodeError.*;
+
 
 @Service
 @RequiredArgsConstructor        // 생성자 자동 주입
@@ -72,23 +74,24 @@ public class MemoService {
     }
 
     // 글 작성 기능
+    @Transactional
     public MessageDto createMemo(MemoRequestDto dto, User user){
 
-        Memo memo = new Memo(dto, user);                        // 컨트롤러에서 @RequestBody 어노테이션으로 body의 내용을 가져온건데 또 할 필요 없겠지
-        memoRepository.save(memo);
+            Memo memo = new Memo(dto, user);                        // 컨트롤러에서 @RequestBody 어노테이션으로 body의 내용을 가져온건데 또 할 필요 없겠지
+            memoRepository.save(memo);
 
-        MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
-        MemoResponseDto responseDto =
-                mrdBuilder.id(memo.getMemoId())
-                        .title(memo.getTitle())
-                        .username(memo.getUsername())
-                        .content(memo.getContent())
-                        .createdAt(memo.getCreatedAt())
-                        .modifiedAt(memo.getModifiedAt())
-                        .getMemos();
+            MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
+            MemoResponseDto responseDto =
+                    mrdBuilder.id(memo.getMemoId())
+                            .title(memo.getTitle())
+                            .username(memo.getUsername())
+                            .content(memo.getContent())
+                            .createdAt(memo.getCreatedAt())
+                            .modifiedAt(memo.getModifiedAt())
+                            .getMemos();
 
-        return new MessageDto( StatusEnum.OK, responseDto);
-    }
+            return new MessageDto( StatusEnum.OK, responseDto);
+        }
 
     // 글 수정 기능
     @Transactional
@@ -132,7 +135,6 @@ public class MemoService {
             throw new CustomException(NO_ACCESS);
         }
 
-
         return new MessageDto(StatusEnum.OK);
     }
 
@@ -147,6 +149,7 @@ public class MemoService {
         ReplyResponseDto responseDto = new ReplyResponseDto(reply, cnt("Reply", reply.getReplyId()));
         return new MessageDto(StatusEnum.OK, responseDto);
     }
+ 
 
     // 댓글 수정 기능
     @Transactional
@@ -168,6 +171,7 @@ public class MemoService {
         ReplyResponseDto responseDto = new ReplyResponseDto(reply, cnt("Reply", reply.getReplyId()));
         return new MessageDto(StatusEnum.OK, responseDto);
     }
+
 
     // 댓글 삭제 기능
     @Transactional
