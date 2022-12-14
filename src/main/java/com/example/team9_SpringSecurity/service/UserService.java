@@ -12,6 +12,9 @@ import com.example.team9_SpringSecurity.util.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static com.example.team9_SpringSecurity.util.ApiResponse.CodeError.*;
 
@@ -46,7 +49,7 @@ public class UserService {
         );
 
         if (!passwordEncoder.matches(password, user.getPassword())) {                                                   // 비밀번호 비교
-            throw new CustomException(PASS_MATCH_FAIL);
+            throw new CustomException(INVALID_PASSWORD);
         }
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));  // 메소드사용하려면 의존성주입 먼저
@@ -65,7 +68,7 @@ public class UserService {
         );
 
         if (!passwordEncoder.matches(password, user.getPassword())) {                                                   // 비밀번호 비교
-            throw new CustomException(PASS_MATCH_FAIL);
+            throw new CustomException(INVALID_PASSWORD);
         }
 
         String token = jwtUtil.resolveToken(request);

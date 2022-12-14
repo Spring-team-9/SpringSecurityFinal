@@ -2,7 +2,7 @@ package com.example.team9_SpringSecurity.entity;
 
 import com.example.team9_SpringSecurity.dto.MemoRequestDto;
 import lombok.Getter;
-import lombok.N oArgsConstructor;
+import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

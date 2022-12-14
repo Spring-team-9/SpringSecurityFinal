@@ -4,6 +4,8 @@ import com.example.team9_SpringSecurity.dto.ReplyRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -19,7 +21,6 @@ public class Reply extends Timestamped{
     private Memo memo;
 
     @ManyToOne                                                      // Reply(many) <-> User(one) Join
-
     @JoinColumn(name = "user_id")
     private User user;
 

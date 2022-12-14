@@ -22,6 +22,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = { CustomException.class })                                    // handleCustomException 메소드는 직접 정의한 CustomException 을 사용
     protected ApiResult handleCustomException(CustomException e) {                          // Exception 발생 시 넘겨받은 ErrorCode 를 사용해서 사용자에게 보여주는 에러 메세지를 정의
         log.error("handleCustomException throw CustomException : {}", e.getCodeError());
+
         return ApiUtil.errorResponse(e.getCodeError());
     }
 }

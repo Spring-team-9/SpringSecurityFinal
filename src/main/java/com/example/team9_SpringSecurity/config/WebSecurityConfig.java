@@ -46,7 +46,7 @@ public class WebSecurityConfig {
                 .antMatchers(HttpMethod.GET, "/**").permitAll()
                 .anyRequest().authenticated()                                                                   // 그 외 요청은 authentication이라는 객체가 Security Context에 있는지 확인함
                 .and()
-                .addFilterBefore(new JwtSecurityFilter(jwtUtil),
+                .addFilterBefore(new JwtAuthFilter(jwtUtil),
                         UsernamePasswordAuthenticationFilter.class);                                            // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣고, 토큰에 저장된 유저정보를 활용하여야 하기 때문에 CustomUserDetailService 클래스를 생성한다.
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
