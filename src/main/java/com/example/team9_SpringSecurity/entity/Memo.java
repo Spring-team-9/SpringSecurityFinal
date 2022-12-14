@@ -2,7 +2,7 @@ package com.example.team9_SpringSecurity.entity;
 
 import com.example.team9_SpringSecurity.dto.MemoRequestDto;
 import lombok.Getter;
-import lombok.N oArgsConstructor;
+import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,6 @@ import java.util.List;
 @Getter                                                                         // Class 모든 필드의 Getter method를 생성
 @Entity                                                                         // Entity임을 선언
 @NoArgsConstructor                                                              // @NoArgsConstructor : 파라미터가 없는 기본 생성자를 생성
-
 public class Memo extends Timestamped {
 
     @Id                                                                         // ID임을 선언

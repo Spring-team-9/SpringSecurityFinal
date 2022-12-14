@@ -1,5 +1,6 @@
 package com.example.team9_SpringSecurity.dto;
 
+import com.example.team9_SpringSecurity.util.ApiResponse.CodeSuccess;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
@@ -13,10 +14,10 @@ public class MessageDto<T> {
     public MessageDto(){
     }
 
-    public MessageDto(StatusEnum status){
+    public MessageDto(CodeSuccess status){
     }
 
-    public MessageDto(StatusEnum status, T dto){
+    public MessageDto(CodeSuccess status, T dto){
         this.data = dto;
     }
 }
