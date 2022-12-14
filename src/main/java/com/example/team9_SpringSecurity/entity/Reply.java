@@ -21,7 +21,6 @@ public class Reply extends Timestamped{
     private Memo memo;
 
     @ManyToOne                                                      // Reply(many) <-> User(one) Join
-
     @JoinColumn(name = "user_id")
     private User user;
 
