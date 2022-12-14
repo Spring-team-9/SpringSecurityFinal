@@ -3,6 +3,7 @@ package com.example.team9_SpringSecurity.controller;
 import com.example.team9_SpringSecurity.dto.MemoRequestDto;
 import com.example.team9_SpringSecurity.dto.MessageDto;
 import com.example.team9_SpringSecurity.dto.ReplyRequestDto;
+
 import com.example.team9_SpringSecurity.service.MemoService;
 import com.example.team9_SpringSecurity.util.ApiResponse.ApiResult;
 import com.example.team9_SpringSecurity.util.ApiResponse.ApiUtil;
@@ -13,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController             // 컨트롤러 선언
-
 @RequiredArgsConstructor    // final 변수, Notnull 표시가 된 변수처럼 필수적인 정보를 세팅하는 생성자를 만든다.
 public class MemoController {
 
@@ -103,44 +103,25 @@ public class MemoController {
         return ApiUtil.successResponse(CodeSuccess.DELETE_OK, messageDto);
     }
 
-    // 글 좋아요 클릭
-    @PostMapping("/api/memos/like/{id}")
-    public ApiResult hitMemoLike(
+    // ---------------좋아요 기능
+    // 글 좋아요 추가/삭제 기능
+    @PutMapping("/api/memos/{id}/like")
+    public ApiResult MemoLike(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails){
-
-        MessageDto messageDto = memoService.hitMemoLike(id, userDetails.getUser());
-        return ApiUtil.successResponse(CodeSuccess.CREATE_OK, messageDto);
+        MessageDto messageDto = memoService.SetMemoLike(id, userDetails.getUser());
+        return ApiUtil.successResponse(CodeSuccess.MODIFY_OK, messageDto);
     }
+  
 
-    // 글 좋아요 클릭
-    @DeleteMapping("/api/memos/like/{id}")
-    public ApiResult cancelTheLike(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetailsImpl userDetails){
-
-        MessageDto messageDto = memoService.cancelMemoLike(id, userDetails.getUser());
-        return ApiUtil.successResponse(CodeSuccess.DELETE_OK, messageDto);
-    }
-
-    // 댓글 좋아요 클릭
-    @PostMapping("/api/memos/like/{id}/{replyId}")
-    public ApiResult hitMemoLike(
+    // 댓글 좋아요 추가/삭제 기능
+    @PutMapping("/api/memos/{id}/{replyId}/like")
+     public ApiResult ReplyLike(
             @PathVariable Long id,
             @PathVariable Long replyId,
             @AuthenticationPrincipal UserDetailsImpl userDetails){
 
-        MessageDto messageDto = memoService.hitReplyLike(id, replyId, userDetails.getUser());
-        return ApiUtil.successResponse(CodeSuccess.CREATE_OK, messageDto);
-    }
-
-    // 댓글 좋아요 클릭
-    @DeleteMapping("/api/memos/like/{id}/{replyId}")
-    public ApiResult cancelTheLike(
-            @PathVariable Long id,
-            @PathVariable Long replyId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        MessageDto messageDto = memoService.cancelReplyLike(id, replyId, userDetails.getUser());
-        return ApiUtil.successResponse(CodeSuccess.DELETE_OK, messageDto);
+        MessageDto messageDto = memoService.SetReplyLike(id, replyId, userDetails.getUser());
+        return ApiUtil.successResponse(CodeSuccess.MODIFY_OK, messageDto);
     }
 }

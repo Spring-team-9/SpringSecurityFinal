@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import static com.example.team9_SpringSecurity.util.ApiResponse.CodeError.*;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -23,6 +22,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private static final String ADMIN_TOKEN = "admin";
+
     public MessageDto signup(SignupRequestDto dto){
         String username = dto.getUsername();
         String password = passwordEncoder.encode(dto.getPassword());
@@ -42,16 +42,39 @@ public class UserService {
         String password = dto.getPassword();
 
         User user = userRepository.findByUsername(username).orElseThrow(
-                ()-> new CustomException(LOGIN_MATCH_FAIL)
+                () -> new CustomException(LOGIN_MATCH_FAIL)
         );
 
-        if(!passwordEncoder.matches(password, user.getPassword())){
-            throw new CustomException(INVALID_PASSWORD);
+        if (!passwordEncoder.matches(password, user.getPassword())) {                                                   // 비밀번호 비교
+            throw new CustomException(PASS_MATCH_FAIL);
         }
 
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(),  user.getRole()));  // 메소드사용하려면 의존성주입 먼저
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));  // 메소드사용하려면 의존성주입 먼저
 
-        return new MessageDto<>(StatusEnum.OK);
-
+        return new MessageDto(StatusEnum.OK);
     }
+    
+    @Transactional
+    // 회원탈퇴
+    public MessageDto delete(LoginRequestDto dto, HttpServletRequest request) {
+        String username = dto.getUsername();
+        String password = dto.getPassword();
+
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new CustomException(LOGIN_MATCH_FAIL)
+        );
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {                                                   // 비밀번호 비교
+            throw new CustomException(PASS_MATCH_FAIL);
+        }
+
+        String token = jwtUtil.resolveToken(request);
+
+        if (token != null) {
+            userRepository.deleteByUsername(username);
+            return new MessageDto(StatusEnum.OK);
+        }
+        throw new CustomException(BAD_REQUEST_TOKEN);
+    }
+
 }

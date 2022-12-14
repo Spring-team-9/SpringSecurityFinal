@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -34,5 +33,11 @@ public class UserController {
     public ApiResult login(@RequestBody LoginRequestDto dto, HttpServletResponse response){
         MessageDto messageDto = userService.login(dto, response);
         return ApiUtil.successResponse(CodeSuccess.LOGIN_OK, messageDto);
+        
+        
+    @DeleteMapping("/login")
+    public ApiResult deleteAccount(@RequestBody @Valid LoginRequestDto dto, HttpServletRequest request) {
+        MessageDto messageDto = userService.delete(dto, request);
+        return ApiUtil.successResponse(CodeSuccess.OK, messageDto);
     }
 }
