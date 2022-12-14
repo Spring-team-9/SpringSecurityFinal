@@ -21,6 +21,7 @@ public class User {
     private String password;
 
     @Column(nullable = false)
+
     @Enumerated(value = EnumType.STRING)                                // Enum을 사용하며 어떤 방식으로 사용할지 설정 // 해당 문자열 그대로 사용
     private UserRoleEnum role;
                                                                         // 회원 탈퇴시 데이터 삭제 처리를 위한 연관관계 설정
@@ -35,6 +36,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)         // User(1) <-> likeReply(n) 관계, 상위 엔티티가 삭제될 경우 하위 엔티티도 삭제되도록 영속성 전이 처리
     private List<LikeReply> likeReplies;
+
 
     public User(String username, String password, UserRoleEnum role){
         this.username = username;

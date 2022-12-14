@@ -2,19 +2,19 @@ package com.example.team9_SpringSecurity.entity;
 
 import com.example.team9_SpringSecurity.dto.MemoRequestDto;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
-
+import lombok.N oArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Getter                                                                         // Class 모든 필드의 Getter method를 생성
 @Entity                                                                         // Entity임을 선언
 @NoArgsConstructor                                                              // @NoArgsConstructor : 파라미터가 없는 기본 생성자를 생성
+
 public class Memo extends Timestamped {
 
-    @Id     // ID임을 선언
+    @Id                                                                         // ID임을 선언
     @Column(name = "MEMO_ID")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long memoId;                                                        // 메모Id
@@ -40,12 +40,13 @@ public class Memo extends Timestamped {
     private List<LikeMemo> likes = new ArrayList<>();                    // n 부분을 List로 받기
 
     public Memo(MemoRequestDto dto, User user) {
+
         this.title = dto.getTitle();
         this.username = user.getUsername();
         this.content = dto.getContent();
         this.user = user;
-    }
 
+    }
     public void update(MemoRequestDto dto) {
         this.title = dto.getTitle();
         this.content = dto.getContent();

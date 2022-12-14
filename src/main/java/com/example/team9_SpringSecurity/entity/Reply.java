@@ -3,11 +3,7 @@ package com.example.team9_SpringSecurity.entity;
 import com.example.team9_SpringSecurity.dto.ReplyRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -15,6 +11,7 @@ import java.util.List;
 public class Reply extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+
     private Long replyId;                                           // 댓글 Id
 
     @ManyToOne                                                      // Reply(many) <-> Memo(one) Join
@@ -22,6 +19,7 @@ public class Reply extends Timestamped{
     private Memo memo;
 
     @ManyToOne                                                      // Reply(many) <-> User(one) Join
+
     @JoinColumn(name = "user_id")
     private User user;
 

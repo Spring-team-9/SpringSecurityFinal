@@ -2,8 +2,10 @@ package com.example.team9_SpringSecurity.service;
 
 import com.example.team9_SpringSecurity.dto.*;
 import com.example.team9_SpringSecurity.entity.*;
+
 import com.example.team9_SpringSecurity.repository.*;
-import com.example.team9_SpringSecurity.util.error.CustomException;
+import com.example.team9_SpringSecurity.util.ApiResponse.CustomException;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,17 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.team9_SpringSecurity.util.error.ErrorCode.*;
+
+import static com.example.team9_SpringSecurity.util.ApiResponse.CodeError.*;
 
 @Service
 @RequiredArgsConstructor        // 생성자 자동 주입
 public class MemoService {
 
     private final MemoRepository memoRepository;
-
-    private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
     private final LikeRepository likeRepository;
+    private final LikeMemoRepository likeMemoRepository;
     private final LikeReplyRepository likeReplyRepository;
 
 
@@ -51,6 +53,7 @@ public class MemoService {
     }
 
     // 선택 글 조회 기능
+
     public MessageDto getMemos(Long id) {
         Memo memo = memoRepository.findById(id).orElseThrow(                                // 입력받은 id값을 Memorepository에서 검색 & 없을경우 Exception 처리
                 () -> new CustomException(MEMO_NOT_FOUND)
@@ -68,11 +71,11 @@ public class MemoService {
                         .addReply(addLikeCntToReplyRsponseDto(memo.getReplies()))
                         .totalcnt(likeMemo)
                         .getMemos();
-
         return new MessageDto(StatusEnum.OK, responseDto);
     }
 
     // 글 작성 기능
+
     public MessageDto createMemo(MemoRequestDto dto, User user) {               // dto + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
 
         Memo memo = new Memo(dto, user);                                        // requestDto + User
@@ -93,51 +96,52 @@ public class MemoService {
         return new MessageDto(StatusEnum.OK, responseDto);
     }
 
+
     // 글 수정 기능
     @Transactional
-    public MessageDto modifyMemo(Long id, MemoRequestDto dto, User user) {      // id + dto + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
-        Memo memo = memoRepository.findById(id).orElseThrow(                    // 입력받은 id값을 Memorepository에서 검색 & 없을경우 Exception 처리
+    public MessageDto modifyMemo (Long id, MemoRequestDto dto, User user) {
+        Memo memo = memoRepository.findById(id).orElseThrow(
                 () -> new CustomException(MEMO_NOT_FOUND)
         );
 
-
-        if (accessPermission(memo.getUsername(), user.getUsername(), user.getRole())) {         // 권한확인(Admin, User) 로직
-
-            memo.update(dto);
-
-            long likeMemo = likeRepository.totalcnt(id);
-            MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
-            MemoResponseDto responseDto =
-                    mrdBuilder.id(memo.getMemoId())
-                            .title(memo.getTitle())
-                            .username(memo.getUsername())
-                            .content(memo.getContent())
-                            .createdAt(memo.getCreatedAt())
-                            .modifiedAt(memo.getModifiedAt())
-                            .addReply(addLikeCntToReplyRsponseDto(memo.getReplies()))
-                            .totalcnt(likeMemo)
-                            .getMemos();
-
-            return new MessageDto(StatusEnum.OK, responseDto);
+        if (memo.getUsername() == user.getUsername() || user.getRole() == UserRoleEnum.ADMIN) {
+            memo.update(dto);  // update는 entity에 새로 정의한 함수
+        } else {
+            throw new CustomException(NO_ACCESS);
         }
-        throw new CustomException(NO_ACCESS);
+
+        long likeMemo = likeRepository.totalcnt(id);
+        MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
+        MemoResponseDto responseDto =
+                mrdBuilder.id(memo.getMemoId())
+                        .title(memo.getTitle())
+                        .username(memo.getUsername())
+                        .content(memo.getContent())
+                        .createdAt(memo.getCreatedAt())
+                        .modifiedAt(memo.getModifiedAt())
+                        .addReply(addLikeCntToReplyResponseDto(memo.getReplies()))
+                        .totalcnt(likeMemo)
+                        .getMemos();
+
+        return new MessageDto( StatusEnum.OK, responseDto);
     }
 
-
-    // 글 삭제 기능
+   // 글 삭제 기능
     @Transactional
-    public MessageDto deleteMemo(Long id, User user) {                                      // id + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
+    public MessageDto deleteMemo (Long id, User user) {
         Memo memo = memoRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("해당 글이 존재하지 않습니다.")
+                () -> new CustomException(MEMO_NOT_FOUND)
         );
 
-
-        if (accessPermission(memo.getUsername(), user.getUsername(), user.getRole())) {     // 권한확인(Admin, User) 로직 & User일 경우 타 사용자 글 삭제 불가
+        if (memo.getUsername() == user.getUsername() || user.getRole() == UserRoleEnum.ADMIN) {
             memoRepository.deleteById(id);
-            return new MessageDto(StatusEnum.OK);
+        } else {
+            throw new CustomException(NO_ACCESS);
         }
-        throw new CustomException(NO_ACCESS);
+
+        return new MessageDto(StatusEnum.OK);
     }
+
 
     // 댓글 작성 기능
     public MessageDto createReply(Long id, ReplyRequestDto dto, User user) {                // id + dto + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
@@ -153,35 +157,49 @@ public class MemoService {
         return new MessageDto(StatusEnum.OK, responseDto);
     }
 
+    
     // 댓글 수정 기능
     @Transactional
-    public MessageDto modifyReply(Long id, Long replyId, ReplyRequestDto dto, User user) {      // id + dto + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
-        Reply reply = replyRepository.findByMemo_MemoIdAndReplyId(id, replyId).orElseThrow(
+    public MessageDto modifyReply(Long id, Long replyId, ReplyRequestDto dto, User user) {
+        Memo memo = memoRepository.findById(id).orElseThrow(
                 () -> new CustomException(MEMO_NOT_FOUND)
         );
 
-        if (accessPermission(reply.getReplyName(), user.getUsername(), user.getRole())) {       // 권한확인(Admin, User) 로직 & User일 경우 타 사용자 글 삭제 불가
-            reply.update(dto);
+        Reply reply = replyRepository.findByMemo_MemoIdAndReplyId(id, replyId).orElseThrow(
+                () -> new CustomException(REPLY_NOT_FOUND)
+        );
 
-            long likeReply = likeReplyRepository.totalcnt(replyId);                             // native-query를 통한 댓글 좋아요 cnt 개수 조회
-            ReplyResponseDto responseDto = new ReplyResponseDto(reply, likeReply);
-            return new MessageDto(StatusEnum.OK, responseDto);
+        if (reply.getReplyName()== user.getUsername() || user.getRole() == UserRoleEnum.ADMIN) {
+            reply.update(dto);
+        } else {
+            throw new CustomException(NO_ACCESS);
         }
-        throw new CustomException(NO_ACCESS);
+        
+        long likeReply = likeReplyRepository.totalcnt(replyId);                             // native-query를 통한 댓글 좋아요 cnt 개수 조회
+        ReplyResponseDto responseDto = new ReplyResponseDto(reply, likeReply);
+        return new MessageDto(StatusEnum.OK, responseDto);
     }
 
+ 
     // 댓글 삭제 기능
     @Transactional
-    public MessageDto deleteReply(Long id, Long replyId, User user) {                                    // id + replyId + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
-        Reply reply = replyRepository.findByMemo_MemoIdAndReplyId(id, replyId).orElseThrow(
+    public MessageDto deleteReply(Long id, Long replyId, User user) {          // 부모클래스인 MessageDto로 리턴타입을 정하고 UserDto도 사용해 다형성 사용
+        Memo memo = memoRepository.findById(id).orElseThrow(
                 () -> new CustomException(MEMO_NOT_FOUND)
         );
 
-        if (accessPermission(reply.getReplyName(), user.getUsername(), user.getRole())) {
+        Reply reply = replyRepository.findByMemo_MemoIdAndReplyId(id, replyId).orElseThrow(
+                () -> new CustomException(REPLY_NOT_FOUND)
+        );
+
+        if (reply.getReplyName()== user.getUsername() || user.getRole() == UserRoleEnum.ADMIN) {
             replyRepository.deleteByReplyId(replyId);
-            return new MessageDto(StatusEnum.OK);
+        } else {
+            throw new CustomException(NO_ACCESS);
         }
-        throw new CustomException(NO_ACCESS);
+
+        return new MessageDto(StatusEnum.OK);
+
     }
 
     @Transactional
@@ -194,15 +212,27 @@ public class MemoService {
         Optional<LikeMemo> likes = likeRepository.findAllByUserId(user.getId());                        // likeMemo에서 일치하는 사용자 정보가 있는지 확인
 
         if (likes.isEmpty()) {                                                                          // 만약 일치하는 정보가 없으면(해당 글에 좋아요를 시도하는 사용자의 정보가 없으면)
-            LikeMemo likeMemo = new LikeMemo(user, memo);                                               // 좋아요 추가
+            LikeMemo memo = new LikeMemo(user, memo);                                               // 좋아요 추가
             likeRepository.save(likeMemo);
-            LikeResponseDto responseDto = new LikeResponseDto(likeMemo);
+            
+             MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
+                MemoResponseDto responseDto =
+                mrdBuilder.id(memo.getMemoId())
+                        .title(memo.getTitle())
+                        .username(memo.getUsername())
+                        .content(memo.getContent())
+                        .totalcnt(likeMemo)
+                        .createdAt(memo.getCreatedAt())
+                        .modifiedAt(memo.getModifiedAt())
+                        .addReply(addLikeCntToReplyResponseDto(memo.getReplies()))
+                        .getMemos();
             return new MessageDto(StatusEnum.OK, responseDto);
         } else {                                                                                        // 일치하는 정보가 있으면(=이미 좋아요를 누른 사용자이면)
             likeRepository.deleteByUserId(user.getId());                                                // 삭제 처리
             return new MessageDto(StatusEnum.OK);
         }
     }
+    
 
     @Transactional
     // 댓글 좋아요 기능 구현
@@ -218,25 +248,27 @@ public class MemoService {
         Optional<LikeReply> likes = likeReplyRepository.findAllByUserId(user.getId());                  // likeReply테이블에서 일치하는 사용자 정보가 있는지 확인
 
         if (likes.isEmpty()) {                                                                          // 만약 일치하는 정보가 없으면(해당 글에 좋아요를 시도하는 사용자의 정보가 없으면)
-            LikeReply likeReply = new LikeReply(user, memo, reply);                                     // 좋아요 추가
+            LikeReply memo = new LikeReply(user, memo, reply);                                          // 좋아요 추가
             likeReplyRepository.save(likeReply);
-            LikeResponseDto responseDto = new LikeResponseDto(likeReply);
-            return new MessageDto(StatusEnum.OK, responseDto);
+            
+            MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
+                MemoResponseDto responseDto =
+                mrdBuilder.id(memo.getMemoId())
+                        .title(memo.getTitle())
+                        .username(memo.getUsername())
+                        .content(memo.getContent())
+                        .totalcnt(likeMemo)
+                        .createdAt(memo.getCreatedAt())
+                        .modifiedAt(memo.getModifiedAt())
+                        .addReply(addLikeCntToReplyResponseDto(memo.getReplies()))
+                        .getMemos();
+             return new MessageDto(StatusEnum.OK, responseDto);
         } else {                                                                                        // 일치하는 정보가 있으면(=이미 좋아요를 누른 사용자이면)
             likeReplyRepository.deleteByMemoMemoId(id);                                                 // 삭제 처리
             return new MessageDto(StatusEnum.OK);
         }
     }
-
-    // 작성자 일치 여부 체크 및 ADMIN 허가 적용
-    public boolean accessPermission(String nameInEntity, String nameInRequest, UserRoleEnum role) {
-        if (nameInEntity.equals(nameInRequest) || role == UserRoleEnum.ADMIN) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
+    
     // 댓글 리스트 + 댓글 cnt 조회 기능
     public List<ReplyResponseDto> addLikeCntToReplyRsponseDto(List<Reply> replies) {
         List<ReplyResponseDto> exportReplies = new ArrayList<>();
@@ -246,5 +278,14 @@ public class MemoService {
             exportReplies.add(new ReplyResponseDto(replies.get(i), likeReply));
         }
         return exportReplies;
+    }
+    
+    // 작성자 일치 여부 체크 및 ADMIN 허가 적용
+    public boolean accessPermission(String nameInEntity, String nameInRequest, UserRoleEnum role) {
+        if (nameInEntity.equals(nameInRequest) || role == UserRoleEnum.ADMIN) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
