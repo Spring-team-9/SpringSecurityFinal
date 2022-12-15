@@ -17,6 +17,6 @@ public interface LikeMemoRepository extends JpaRepository<LikeMemo, Long> {
     @Query(
             value = "select count(1) From like_memo AS a INNER JOIN memo AS b ON a.memo_id = b.memo_id WHERE a.memo_id = :id",
             nativeQuery = true)
-    long totalcnt(@PathVariable("id") Long id);
+    long totalCnt(@PathVariable("id") Long id);
 
 }

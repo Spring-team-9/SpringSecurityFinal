@@ -30,11 +30,11 @@ public class MemoService {
 
     // 전체 글 조회
     public MessageDto<?> getMemos() {                                                       // 부모클래스인 MessageDto로 리턴타입을 정하고 UserDto도 사용해 다형성 사용
-        List<Memo> memolist = memoRepository.findAllByOrderByCreatedAtDesc();               // memoList 전체를 생성일자 기준으로 조회
+        List<Memo> memoList = memoRepository.findAllByOrderByCreatedAtDesc();               // memoList 전체를 생성일자 기준으로 조회
         List<MemoResponseDto> responseDtoList = new ArrayList<>();                          // Dto
 
-        for (Memo memo : memolist) {
-            long likeMemo = likeMemoRepository.totalcnt(memo.getMemoId());                      // native-query를 통한 글 좋아요 cnt 개수 조회
+        for (Memo memo : memoList) {
+            long likeMemo = likeMemoRepository.totalCnt(memo.getMemoId());                      // native-query를 통한 글 좋아요 cnt 개수 조회
 
             MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();               // Builder-Pattern Dto 생성
             MemoResponseDto responseDto =
@@ -58,7 +58,7 @@ public class MemoService {
         Memo memo = memoRepository.findById(id).orElseThrow(                                // 입력받은 id값을 Memorepository에서 검색 & 없을경우 Exception 처리
                 () -> new CustomException(MEMO_NOT_FOUND)
         );
-        long likeMemo = likeMemoRepository.totalcnt(id);                                        // native-query를 통한 글 좋아요 cnt 개수 조회
+        long likeMemo = likeMemoRepository.totalCnt(id);                                        // native-query를 통한 글 좋아요 cnt 개수 조회
 
         MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();                   // Builder-Pattern Dto 생성
         MemoResponseDto responseDto =
@@ -81,7 +81,7 @@ public class MemoService {
         Memo memo = new Memo(dto, user);                                        // requestDto + User
         memoRepository.save(memo);                                              // 저장
 
-        long likeMemo = likeMemoRepository.totalcnt(memo.getMemoId());          // native-query를 통한 글 좋아요 cnt 개수 조회
+        long likeMemo = likeMemoRepository.totalCnt(memo.getMemoId());          // native-query를 통한 글 좋아요 cnt 개수 조회
         MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
         MemoResponseDto responseDto =
                 mrdBuilder.id(memo.getMemoId())
@@ -110,7 +110,7 @@ public class MemoService {
             throw new CustomException(NO_ACCESS);
         }
 
-        long likeMemo = likeMemoRepository.totalcnt(id);
+        long likeMemo = likeMemoRepository.totalCnt(id);
         MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
         MemoResponseDto responseDto =
                 mrdBuilder.id(memo.getMemoId())
@@ -126,8 +126,8 @@ public class MemoService {
         return new MessageDto<>(CodeSuccess.MODIFY_OK, responseDto);
     }
 
-    // 글 삭제 기능
     @Transactional
+    // 글 삭제 기능
     public MessageDto<?> deleteMemo (Long id, User user) {
         Memo memo = memoRepository.findById(id).orElseThrow(
                 () -> new CustomException(MEMO_NOT_FOUND)
@@ -152,7 +152,7 @@ public class MemoService {
         Reply newOne = new Reply(dto, user, memo);
         replyRepository.save(newOne);
 
-        long likeReply = likeReplyRepository.totalcnt(newOne.getReplyId());                  // native-query를 통한 댓글 좋아요 cnt 개수 조회
+        long likeReply = likeReplyRepository.totalCnt(newOne.getReplyId());                  // native-query를 통한 댓글 좋아요 cnt 개수 조회
         ReplyResponseDto responseDto = new ReplyResponseDto(newOne, likeReply);
         return new MessageDto<>(CodeSuccess.CREATE_OK, responseDto);
     }
@@ -161,9 +161,6 @@ public class MemoService {
     // 댓글 수정 기능
     @Transactional
     public MessageDto<?> modifyReply(Long id, Long replyId, ReplyRequestDto dto, User user) {
-        Memo memo = memoRepository.findById(id).orElseThrow(
-                () -> new CustomException(MEMO_NOT_FOUND)
-        );
 
         Reply reply = replyRepository.findByMemo_MemoIdAndReplyId(id, replyId).orElseThrow(
                 () -> new CustomException(REPLY_NOT_FOUND)
@@ -175,18 +172,15 @@ public class MemoService {
             throw new CustomException(NO_ACCESS);
         }
 
-        long likeReply = likeReplyRepository.totalcnt(replyId);                             // native-query를 통한 댓글 좋아요 cnt 개수 조회
+        long likeReply = likeReplyRepository.totalCnt(replyId);                             // native-query를 통한 댓글 좋아요 cnt 개수 조회
         ReplyResponseDto responseDto = new ReplyResponseDto(reply, likeReply);
         return new MessageDto<>(CodeSuccess.MODIFY_OK, responseDto);
     }
 
 
-    // 댓글 삭제 기능
     @Transactional
+    // 댓글 삭제 기능
     public MessageDto<?> deleteReply(Long id, Long replyId, User user) {
-        Memo memo = memoRepository.findById(id).orElseThrow(
-                () -> new CustomException(MEMO_NOT_FOUND)
-        );
 
         Reply reply = replyRepository.findByMemo_MemoIdAndReplyId(id, replyId).orElseThrow(
                 () -> new CustomException(REPLY_NOT_FOUND)
@@ -202,7 +196,6 @@ public class MemoService {
 
     }
 
-    @Transactional
     // 글 좋아요 기능 구현
     public MessageDto<?> SetMemoLike(Long id, User user) {                                              // id + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
         Memo memo = memoRepository.findById(id).orElseThrow(                                            // Id와 일치하는 글이 있는지 확인
@@ -214,7 +207,7 @@ public class MemoService {
         if (likes.isEmpty()) {                                                                          // 만약 일치하는 정보가 없으면(해당 글에 좋아요를 시도하는 사용자의 정보가 없으면)
             LikeMemo memoLike = new LikeMemo(user, memo);                                               // 좋아요 추가
             likeMemoRepository.save(memoLike);
-            long likeMemo = likeMemoRepository.totalcnt(memo.getMemoId());
+            long likeMemo = likeMemoRepository.totalCnt(memo.getMemoId());
 
             MemoResponseDtoBuilder mrdBuilder = new MemoResponseDtoBuilder();
             MemoResponseDto responseDto =
@@ -235,7 +228,6 @@ public class MemoService {
     }
 
 
-    @Transactional
     // 댓글 좋아요 기능 구현
     public MessageDto<?> SetReplyLike(Long id, Long replyId, User user) {                               // id + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
         Memo memo = memoRepository.findById(id).orElseThrow(                                            // Id와 일치하는 글이 있는지 확인
@@ -264,7 +256,7 @@ public class MemoService {
         List<ReplyResponseDto> exportReplies = new ArrayList<>();
         for (int i = 0; i < replies.size(); i++) {
             Long replyId = replies.get(i).getReplyId();
-            Long likeReply = likeReplyRepository.totalcnt(replyId);
+            Long likeReply = likeReplyRepository.totalCnt(replyId);
             exportReplies.add(new ReplyResponseDto(replies.get(i), likeReply));
         }
         return exportReplies;
