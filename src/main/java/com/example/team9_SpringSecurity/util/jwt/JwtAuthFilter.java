@@ -23,21 +23,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
+    // FilterChain : 요청(Request)과 응답(Response)에 대한 정보들을 변경할 수 있게 개발자들에게 제공하는 서블린 컨테이너
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+        // 1. 요청에서 받아온 토큰의 문자열 받기
         String token = jwtUtil.resolveToken(request);
 
+        // 2. 토큰 유효 판별
         if(token != null) {
             if(!jwtUtil.validateToken(token)){
                 throw new IllegalAccessError();
             }
+            // 3. 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication에 세팅
             Claims info = jwtUtil.getUserInfoFromToken(token);
             setAuthentication(info.getSubject());
         }
+        // 4. 다음 필터로 넘어간다
         filterChain.doFilter(request, response);
     }
 
+    // SecurityContextHolder > SecurityContext > Authentication 설정
     public void setAuthentication(String username) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.createAuthentication(username);

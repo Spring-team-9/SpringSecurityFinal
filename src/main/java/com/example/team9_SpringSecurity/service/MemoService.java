@@ -204,12 +204,12 @@ public class MemoService {
 
     @Transactional
     // 글 좋아요 기능 구현
-    public MessageDto<?> SetMemoLike(Long id, User user) {                                                 // id + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
+    public MessageDto<?> SetMemoLike(Long id, User user) {                                              // id + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
         Memo memo = memoRepository.findById(id).orElseThrow(                                            // Id와 일치하는 글이 있는지 확인
                 () -> new CustomException(MEMO_NOT_FOUND)
         );
 
-        Optional<LikeMemo> likes = likeMemoRepository.findAllByUserId(user.getId());                        // likeMemo에서 일치하는 사용자 정보가 있는지 확인
+        Optional<LikeMemo> likes = likeMemoRepository.findAllByUserId(user.getId());                    // likeMemo에서 일치하는 사용자 정보가 있는지 확인
 
         if (likes.isEmpty()) {                                                                          // 만약 일치하는 정보가 없으면(해당 글에 좋아요를 시도하는 사용자의 정보가 없으면)
             LikeMemo memoLike = new LikeMemo(user, memo);                                               // 좋아요 추가
@@ -237,7 +237,7 @@ public class MemoService {
 
     @Transactional
     // 댓글 좋아요 기능 구현
-    public MessageDto<?> SetReplyLike(Long id, Long replyId, User user) {                                  // id + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
+    public MessageDto<?> SetReplyLike(Long id, Long replyId, User user) {                               // id + Spring Security(userDatailsimple)을 통한 사용자 정보 사용
         Memo memo = memoRepository.findById(id).orElseThrow(                                            // Id와 일치하는 글이 있는지 확인
                 () -> new CustomException(MEMO_NOT_FOUND)
         );

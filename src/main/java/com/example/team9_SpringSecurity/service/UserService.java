@@ -29,7 +29,7 @@ public class UserService {
     // 회원가입
     public MessageDto<?> signup(SignupRequestDto dto){
         String username = dto.getUsername();
-        String password = passwordEncoder.encode(dto.getPassword());    // 암호화
+        String password = passwordEncoder.encode(dto.getPassword());   // 암호화
         UserRoleEnum role = ADMIN_TOKEN.equals(dto.getAdminToken()) ? UserRoleEnum.ADMIN : UserRoleEnum.USER ;
 
         if(userRepository.findByUsername(username).isPresent()){
