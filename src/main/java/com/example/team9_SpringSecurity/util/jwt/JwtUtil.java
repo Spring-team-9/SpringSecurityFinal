@@ -75,7 +75,7 @@ public class JwtUtil {
     }
 
     // 토큰 검증
-    public boolean validateToken(String token){
+    public boolean validateToken(String token) {
         try {
 
             //parser : parsing을 하는 도구. parsing : token에 내재된 자료 구조를 빌드하고 문법을 검사한다.

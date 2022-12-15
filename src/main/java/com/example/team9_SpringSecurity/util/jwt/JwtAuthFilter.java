@@ -32,7 +32,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // 2. 토큰 유효 판별
         if(token != null) {
             if(!jwtUtil.validateToken(token)){
-                throw new IllegalAccessError();
+                throw new CustomException(INVALID_TOKEN);                                                               // 커스텀한 실패 메세지로 보내고 싶었는데 다음 필터로 넘어가 실패
             }
             // 3. 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication에 세팅
             Claims info = jwtUtil.getUserInfoFromToken(token);
