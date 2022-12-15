@@ -87,7 +87,7 @@
 
 ![image](https://user-images.githubusercontent.com/117708164/207763060-64a7f585-8ee9-4fb3-bb0f-f1c4224cb2a7.png)
 
-📍 실제 설계된 Diagram
+📍 구성 후 실제 Diagram
 
 ![image](https://user-images.githubusercontent.com/117708164/207763220-0a3d948f-98e7-4831-a026-0cc29824c0a4.png)
    
