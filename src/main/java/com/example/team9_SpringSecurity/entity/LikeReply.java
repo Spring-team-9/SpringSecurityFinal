@@ -12,7 +12,7 @@ public class LikeReply {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long LikeId;                                            // 좋아요 Id
+    private Long Id;                                            // 좋아요 Id
 
     @ManyToOne                                                      // LikeReply(many) <-> User(one) Join
     @JoinColumn(name = "USER_ID", nullable = false)

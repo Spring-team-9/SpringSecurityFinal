@@ -13,7 +13,6 @@ import java.util.List;
 public class Reply extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-
     private Long replyId;                                           // 댓글 Id
 
     @ManyToOne                                                      // Reply(many) <-> Memo(one) Join

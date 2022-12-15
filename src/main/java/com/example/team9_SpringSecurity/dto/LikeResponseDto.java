@@ -12,13 +12,13 @@ public class LikeResponseDto {
     private Long replyId;   // 댓글 Id
 
     public LikeResponseDto(LikeMemo likeMemo) {
-        this.LikeId = likeMemo.getLikeId();
+        this.LikeId = likeMemo.getId();
         this.memoId = likeMemo.getMemo().getMemoId();
         this.userId = likeMemo.getUser().getId();
     }
 
     public LikeResponseDto(LikeReply likeReply) {
-        this.LikeId = likeReply.getLikeId();
+        this.LikeId = likeReply.getId();
         this.replyId = likeReply.getReply().getReplyId();
         this.memoId = likeReply.getMemo().getMemoId();
         this.userId = likeReply.getUser().getId();
