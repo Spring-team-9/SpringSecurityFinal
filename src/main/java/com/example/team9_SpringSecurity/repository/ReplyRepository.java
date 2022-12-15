@@ -10,7 +10,5 @@ import java.util.Optional;
 public interface ReplyRepository extends JpaRepository<Reply,Long> {
     Optional<Reply> findByMemo_MemoIdAndReplyId(Long id, Long replyId);
 
-    Long findByMemoMemoId(Long id);
     void deleteByReplyId(Long replyId);
-    List<Reply> findAllByMemo(Memo memo);
 }

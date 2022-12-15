@@ -26,9 +26,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private static final String ADMIN_TOKEN = "admin";
 
+    // 회원가입
     public MessageDto<?> signup(SignupRequestDto dto){
         String username = dto.getUsername();
-        String password = passwordEncoder.encode(dto.getPassword());
+        String password = passwordEncoder.encode(dto.getPassword());    // 암호화
         UserRoleEnum role = ADMIN_TOKEN.equals(dto.getAdminToken()) ? UserRoleEnum.ADMIN : UserRoleEnum.USER ;
 
         if(userRepository.findByUsername(username).isPresent()){
@@ -40,6 +41,7 @@ public class UserService {
         return new MessageDto<>(CodeSuccess.JOIN_OK);
     }
 
+    // 로그인
     public MessageDto<?> login(LoginRequestDto dto, HttpServletResponse response){
         String username = dto.getUsername();
         String password = dto.getPassword();
@@ -52,7 +54,7 @@ public class UserService {
             throw new CustomException(INVALID_PASSWORD);
         }
 
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));  // 메소드사용하려면 의존성주입 먼저
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
 
         return new MessageDto<>(CodeSuccess.LOGIN_OK);
     }

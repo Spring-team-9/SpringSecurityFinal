@@ -11,7 +11,7 @@ public class LikeResponseDto {
     private Long userId;    // 사용자 Id
     private Long replyId;   // 댓글 Id
 
-    public LikeResponseDto(LikeMemo likeMemo) {             // 글 좋아요
+    public LikeResponseDto(LikeMemo likeMemo) {
         this.LikeId = likeMemo.getLikeId();
         this.memoId = likeMemo.getMemo().getMemoId();
         this.userId = likeMemo.getUser().getId();

@@ -21,22 +21,24 @@ public class UserController {
 
     private final UserService userService;
 
+    // 회원가입
     @PostMapping("/signup")
-
     public ApiResult signup(@RequestBody @Valid SignupRequestDto dto){
-        MessageDto messageDto = userService.signup(dto);
+        MessageDto<?> messageDto = userService.signup(dto);
         return ApiUtil.successResponse(CodeSuccess.JOIN_OK, messageDto);
     }
 
+    // 로그인
     @PostMapping("/login")
     public ApiResult login(@RequestBody LoginRequestDto dto, HttpServletResponse response) {
-        MessageDto messageDto = userService.login(dto, response);
+        MessageDto<?> messageDto = userService.login(dto, response);
         return ApiUtil.successResponse(CodeSuccess.LOGIN_OK, messageDto);
     }
-        
+
+    // 회원탈퇴
     @DeleteMapping("/login")
     public ApiResult deleteAccount(@RequestBody @Valid LoginRequestDto dto, HttpServletRequest request) {
-        MessageDto messageDto = userService.delete(dto, request);
+        MessageDto<?> messageDto = userService.delete(dto, request);
         return ApiUtil.successResponse(CodeSuccess.OK, messageDto);
     }
 }
