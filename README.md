@@ -95,6 +95,10 @@
 
 ### 📌 4. API
 
+https://documenter.getpostman.com/view/19619178/2s8YzWSgcr
+
+![image](https://user-images.githubusercontent.com/117708164/207765206-68ff1c99-fd09-4ec2-bcd0-a51024f7e90e.png)
+
 
 ----------------------------------------------------------------------------------------------------------------
 
